@@ -11,7 +11,7 @@ Could also be used for production services, but that's not the objective.
 ## Usage
 
 ```js
-var Nocker = require('../');
+var Nocker = require('nocker');
 
 Nocker.register([
 
