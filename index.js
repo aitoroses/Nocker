@@ -4,7 +4,10 @@ var express = require('express');
 var colors = require('colors');
 
 var DEFAULT_OPTIONS = {
-  delay: 500
+  delay: 500,
+  useCors: true
+  useMulter: false
+  proxy: 'http://localhost:8080'
 }
 
 // Middlewares
@@ -27,11 +30,11 @@ function Nocker(options) {
   this.app = express();
 
   // Middlewares
-  // this.app.use(CORS());
+  this.app.use(CORS());
   this.app.use(JWT());
   this.app.use(bodyParser.json());
   this.app.use(multer({ dest: '../uploads/'}));
-  this.app.use('/eAppAngular', proxy(url.parse('http://localhost:3000')));
+  this.app.use('/proxy', proxy(url.parse('http://localhost:8080')));
 }
 
 Nocker.prototype.route = _request;
