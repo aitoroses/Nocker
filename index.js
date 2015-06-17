@@ -5,8 +5,8 @@ var colors = require('colors');
 
 var DEFAULT_OPTIONS = {
   delay: 500,
-  useCors: true
-  useMulter: false
+  useCors: true,
+  useMulter: false,
   proxy: 'http://localhost:8080'
 }
 
