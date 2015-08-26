@@ -88,10 +88,8 @@ function _request(method, path) {
           var result = fn.call(context, req.params, req.query, req.body);
           if (result) {
             respond(req, res, result, opts);
-          } else {
-            // Finalise the request
-            res.end();
           }
+          // Else the user will have to end the response.
         });
       }
     }
