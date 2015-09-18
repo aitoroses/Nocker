@@ -72,30 +72,44 @@ function _request(method, path) {
 
       var opts = opts || {};
 
-      // RESPOND
-
-      if(typeof response == "object" || typeof response == "string") {
-        // In case of object
-        route.call(ctx.app, path, function(req, res) {
-          respond(req, res, response, opts);
-        });
-      }
-
-      if(typeof response == "function") {
-        var fn = response;
-        route.call(ctx.app, path, function(req, res) {
-          var context = {req: req, res: res};
-          var result = fn.call(context, req.params, req.query, req.body);
-          if (result) {
-            respond(req, res, result, opts);
+      function lookupAuthorization(req, res, next) {
+        // Authorization
+        if (opts.auth && (opts.requiresAuth != false)) {
+          if(!req.authenticated) {
+            res.statusCode = 401;
+            res.set({"Content-Type": 'text/plain'});
+            res.write("User has no access to this resource");
+            res.end();
+            return
           }
-          // Else the user will have to end the response.
-        });
+        }
+
+        if (next) next()
       }
+
+      route.call(ctx.app, path, function(req, res) {
+        lookupAuthorization(req, res, function() {
+          // RESPOND
+          if(typeof response == "object" || typeof response == "string") {
+            // In case of object
+            respond(req, res, response, opts)
+            return
+          }
+
+          if(typeof response == "function") {
+            var fn = response;
+            var context = {req: req, res: res};
+            var result = fn.call(context, req.params, req.query, req.body);
+            if (result) {
+              respond(req, res, result, opts)
+            }
+            // Else the user will have to end the response.
+          }
+        })
+      })
     }
   }
 }
-
 
 /**
  * respond - Responding middleware
@@ -115,17 +129,6 @@ function respond(req, res, response, options) {
 
   // Respond with a delay
   setTimeout(function() {
-
-    // Authorization
-    if (options.auth && (options.requiresAuth != false)) {
-      if(!req.authenticated) {
-        res.statusCode = 401;
-        res.set({"Content-Type": 'text/plain'});
-        res.write("User has no access to this resource");
-        res.end();
-        return
-      }
-    }
 
     // Custom contentType
     if (options.contentType) {
