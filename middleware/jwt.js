@@ -8,7 +8,7 @@ module.exports = function() {
   return function JWT(req, res, next) {
 
     // Expose header
-    // res.header({'Access-Control-Expose-Headers': "Authorization"})
+    res.header({'Access-Control-Expose-Headers': "Authorization"})
 
     var header = req.get("Authorization");
 
